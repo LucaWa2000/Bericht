@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bericht schreiben – Quiz (Klasse 7)</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#1d2733;--mute:#5d6b7a;--line:#d5dce6;--acc:#2f5fd0;--ok:#1f7a52;--okbg:#e3f4ec;--bad:#b4332a;--badbg:#fbe8e6}
+@media (prefers-color-scheme:dark){:root{--bg:#141a22;--card:#1d2631;--ink:#e8edf3;--mute:#9aa8b8;--line:#33414f;--acc:#7da2ff;--ok:#5fd09b;--okbg:#17352a;--bad:#ff8b80;--badbg:#3b1f1c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif;padding:16px}
+main{max-width:640px;margin:0 auto}
+h1{font-size:1.5rem;margin:8px 0 4px}
+.sub{color:var(--mute);margin:0 0 16px;font-family:system-ui,sans-serif;font-size:.9rem}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+.meta{display:flex;justify-content:space-between;font:.85rem system-ui,sans-serif;color:var(--mute);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+.q{font-size:1.15rem;font-weight:700;margin:0 0 14px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:11px 14px;margin:0 0 9px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--acc)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default}
+.fb{margin-top:12px;padding:12px 14px;border-radius:8px;font-size:.97rem}
+.fb.ok{background:var(--okbg)}.fb.bad{background:var(--badbg)}
+.fb b{font-family:system-ui,sans-serif}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btn{font:600 .95rem system-ui,sans-serif;border:1.5px solid var(--acc);background:var(--acc);color:#fff;border-radius:8px;padding:10px 18px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--acc)}
+.hint{color:var(--mute);font-style:italic;margin-top:10px;font-size:.95rem}
+.score{font-size:2.4rem;font-weight:700;margin:4px 0}
+.rev{margin:14px 0 0;padding:0;list-style:none;font-size:.95rem}
+.rev li{padding:8px 0;border-top:1px solid var(--line)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Bericht schreiben</h1>
+<p class="sub">Deutsch · Klasse 7 · 20 Fragen</p>
+<div id="app"></div>
+</main>
+<script>
+// Format: [Frage, [Antworten], Index der richtigen Antwort, Hinweis, Erklärung]
+const Q=[
+["Welche Zeitform verwendest du in der Regel in einem Bericht?",["Präsens","Futur I","Präteritum","Perfekt"],2,"Es geht um etwas, das schon passiert ist.","Ein Bericht beschreibt ein vergangenes Geschehen, deshalb schreibst du im Präteritum: Der Radfahrer stürzte."],
+["Welche Aussage über die Sprache in einem Bericht stimmt?",["Sie ist spannend und voller Gefühle.","Sie ist sachlich und ohne persönliche Meinung.","Sie enthält viele Übertreibungen.","Sie besteht hauptsächlich aus wörtlicher Rede."],1,"Ein Bericht soll informieren, nicht unterhalten.","Ein Bericht ist sachlich und objektiv. Meinungen, Gefühle und Übertreibungen gehören nicht hinein."],
+["Welche W-Fragen beantwortet die Einleitung eines Berichts?",["Warum ist jemand schuld? Was sollte man ändern?","Was geschah? Wann? Wo? Wer war beteiligt?","Wie fühlte ich mich? Was denke ich?","Wie finde ich das Ereignis?"],1,"Denk an die wichtigsten Fakten.","Die Einleitung nennt Was, Wann, Wo und Wer. Der Hauptteil erzählt dann den genauen Ablauf."],
+["In welcher Reihenfolge erzählst du den Ablauf im Hauptteil?",["Das Spannendste zuerst","In beliebiger Reihenfolge","Rückwärts vom Ende zum Anfang","Chronologisch, in zeitlicher Reihenfolge"],3,"Wie ist es wirklich passiert?","Der Ablauf wird Schritt für Schritt so erzählt, wie er geschah. So kann der Leser alles nachvollziehen."],
+["Welcher Satz passt am besten in einen Unfallbericht?",["Plötzlich krachte es furchtbar!","Der Radfahrer war selbst schuld.","Ich finde solche Unfälle schlimm.","Um 14:30 Uhr stieß ein Radfahrer an der Kreuzung mit einem Auto zusammen."],3,"Suche den Satz ohne Gefühle und Wertungen.","Dieser Satz ist sachlich, steht im Präteritum und nennt Zeit, Ort und Beteiligte."],
+["Was ist das Hauptziel eines Berichts?",["Den Leser zu unterhalten","Den Leser genau und sachlich zu informieren","Den Leser zu überzeugen","Den Leser zu erschrecken"],1,"Denk an das Wort „berichten“.","Ein Bericht gibt Fakten wieder, damit der Leser genau weiß, was geschehen ist."],
+["Wie gehst du in einem Bericht mit wörtlicher Rede um?",["Ich benutze sie möglichst oft.","Ich vermeide sie und nutze bei Bedarf die indirekte Rede.","Ich benutze sie nur im Schluss.","Ich schreibe nur wörtliche Rede."],1,"Berichte bleiben nüchtern.","Wörtliche Rede wirkt lebendig und gehört eher in Erzählungen. Im Bericht gibst du Aussagen, wenn nötig, in indirekter Rede wieder."],
+["Wie ist ein Bericht aufgebaut?",["Nur ein Hauptteil","Einleitung, Hauptteil, Schluss","Schluss, Hauptteil, Einleitung","Überschrift, Witz, Pointe"],1,"Drei Teile.","Einleitung (Was, Wann, Wo, Wer), Hauptteil (Ablauf) und Schluss (Folgen oder Ergebnis)."],
+["Welche Überschrift passt am besten zu einem Bericht?",["Das war ein Schock!","Mein schlimmster Tag","Fahrradunfall an der Hauptstraße","Warum Radfahren gefährlich ist"],2,"Sie soll sagen, worüber berichtet wird.","Eine gute Überschrift nennt kurz und sachlich das Ereignis und oft den Ort."],
+["Wie schreibst du in einem Bericht meistens?",["In der Ich-Form mit vielen Gefühlen","Sachlich in der 3. Person oder unpersönlich","In der Du-Form","In Reimen"],1,"Der Schreiber tritt in den Hintergrund.","Meist steht das Geschehen im Vordergrund, nicht der Schreiber. Ausnahme: Erlebnis- oder Praktikumsberichte in der Ich-Form."],
+["Was gehört in den Schluss eines Unfallberichts?",["Meine persönliche Meinung","Die Folgen, zum Beispiel Verletzte oder Schaden","Ein Witz","Ein Wunsch für die Zukunft"],1,"Was war das Ergebnis?","Im Schluss steht, wie das Ereignis ausging, etwa Verletzungen, Schäden oder eingeleitete Maßnahmen."],
+["Wofür schreibt man einen Unfallbericht zum Beispiel?",["Für das Tagebuch","Für die Polizei oder die Versicherung","Für eine Geburtstagskarte","Für ein Gedicht"],1,"Hier sind genaue Fakten wichtig.","Polizei und Versicherung brauchen genaue und sachliche Angaben über den Hergang."],
+["Worüber informiert ein Praktikumsbericht?",["Über die Tätigkeiten und Erfahrungen im Praktikum","Über das Wetter","Über erfundene Abenteuer","Über die Lieblingsfilme"],0,"Praktikum = Arbeitserfahrung.","Ein Praktikumsbericht beschreibt, was du im Betrieb getan und gelernt hast."],
+["Welches Wort passt NICHT in einen sachlichen Bericht?",["gegen 15 Uhr","anschließend","schrecklich","die Feuerwehr"],2,"Suche das wertende Wort.","„Schrecklich“ drückt ein Gefühl und eine Wertung aus. Berichte bleiben neutral."],
+["Welcher Satz steht richtig im Präteritum?",["Die Klasse besucht das Museum.","Die Klasse besuchte das Museum.","Die Klasse wird das Museum besuchen.","Die Klasse besuche das Museum."],1,"Vergangenheit, einfache Form.","Das Präteritum von „besuchen“ ist „besuchte“."],
+["Was hilft dir, bevor du den Bericht schreibst?",["Ein Stichwortzettel mit den Antworten auf die W-Fragen","Gar nichts, einfach losschreiben","Nur die Überschrift","Ein langes Gedicht"],0,"Ordnung vor dem Schreiben.","Mit Stichwörtern zu Was, Wann, Wo, Wer und Ablauf behältst du den Überblick."],
+["Welche Wörter helfen, den zeitlichen Ablauf zu zeigen?",["zuerst, danach, anschließend","aber, trotzdem, obwohl","leider, hoffentlich, bestimmt","super, toll, mega"],0,"Sie zeigen die Reihenfolge.","Zeitliche Verknüpfungen wie „zuerst“, „danach“ oder „anschließend“ machen den Ablauf klar."],
+["Wo stehen im Bericht die wichtigsten Informationen?",["Ganz am Ende","In der Einleitung","Nirgends","Nur in der Überschrift"],1,"Der Leser soll sofort wissen, worum es geht.","Das Wichtigste (Was, Wann, Wo, Wer) steht gleich am Anfang."],
+["Was unterscheidet einen Bericht von einer Erzählung?",["Der Bericht ist spannend und gefühlvoll.","Der Bericht ist sachlich und ohne Spannungsaufbau.","Die Erzählung ist immer kürzer.","Es gibt keinen Unterschied."],1,"Denk an Ziel und Sprache.","Eine Erzählung will unterhalten und Spannung erzeugen, ein Bericht will sachlich informieren."],
+["Warum muss ein Bericht auch für Fremde verständlich sein?",["Weil der Leser nicht dabei war","Weil Berichte nie gelesen werden","Weil Fremde immer Fragen stellen","Weil es Pflicht ist, lang zu schreiben"],0,"Wer liest den Bericht?","Der Leser kennt das Ereignis nicht. Deshalb müssen alle wichtigen Informationen genau und klar im Text stehen."]
+];
+const L="ABCD";let i=0,pts=0,ans=[],done=false;
+const app=document.getElementById("app");
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function render(){
+app.textContent="";
+if(i>=Q.length)return result();
+const q=Q[i];done=false;
+const bar=el("div","bar");const fill=el("i");fill.style.width=(i/Q.length*100)+"%";bar.append(fill);
+const meta=el("div","meta");meta.append(el("span",null,"Frage "+(i+1)+" von "+Q.length),el("span",null,"Punkte: "+pts));
+const card=el("div","card");card.append(el("p","q",q[0]));
+const box=el("div");
+q[1].forEach((t,k)=>{const b=el("button","opt",L[k]+") "+t);b.type="button";b.onclick=()=>pick(k,box,fb,nxt,hintB,hint);box.append(b)});
+const fb=el("div","fb");fb.hidden=true;fb.setAttribute("role","status");
+const hint=el("div","hint",q[3]);hint.hidden=true;
+const hintB=el("button","btn ghost","Hinweis zeigen");hintB.type="button";hintB.onclick=()=>{hint.hidden=false;hintB.hidden=true};
+const nxt=el("button","btn",i<Q.length-1?"Weiter":"Ergebnis ansehen");nxt.type="button";nxt.hidden=true;nxt.onclick=()=>{i++;render()};
+const row=el("div","row");row.append(hintB,nxt);
+card.append(box,hint,fb,row);app.append(bar,meta,card);
+}
+function pick(k,box,fb,nxt,hintB,hint){
+if(done)return;done=true;const q=Q[i],good=k===q[2];
+if(good)pts++;ans.push(k);
+[...box.children].forEach((b,j)=>{b.disabled=true;if(j===q[2])b.classList.add("ok");else if(j===k)b.classList.add("bad")});
+fb.hidden=false;fb.className="fb "+(good?"ok":"bad");fb.textContent="";
+fb.append(el("b",null,good?"Richtig! ":"Nicht ganz. "),document.createTextNode(q[4]));
+hintB.hidden=true;hint.hidden=true;nxt.hidden=false;nxt.focus();
+}
+function result(){
+const bar=el("div","bar");const f=el("i");f.style.width="100%";bar.append(f);
+const card=el("div","card");
+card.append(el("div","score",pts+" / "+Q.length));
+const p=pts/Q.length;
+card.append(el("p",null,p>=.9?"Hervorragend! Du beherrschst den Bericht.":p>=.7?"Gut gemacht! Schau dir die Fehler noch einmal an.":p>=.5?"Ein solides Grundwissen. Wiederhole die Merkmale eines Berichts.":"Übe noch etwas: Zeitform, Sprache und Aufbau sind die wichtigsten Punkte."));
+const ul=el("ul","rev");
+Q.forEach((q,k)=>{if(ans[k]!==q[2]){const li=el("li");li.append(el("b",null,(k+1)+". "+q[0]),el("br"),document.createTextNode("Richtig: "+q[1][q[2]]+". "+q[4]));ul.append(li)}});
+if(ul.children.length){card.append(el("p",null,"Das solltest du wiederholen:"),ul)}
+const row=el("div","row");const r=el("button","btn","Quiz neu starten");r.type="button";r.onclick=()=>{i=0;pts=0;ans=[];render()};row.append(r);card.append(row);
+app.append(bar,card);
+}
+render();
+</script>
+</body>
+</html>
